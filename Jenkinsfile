@@ -52,7 +52,7 @@ pipeline {
                       fi
                       docker run --name ${containerName} -d -p ${appPort}:${appPort} ${appName}
                     """
-                    )
+                    
                 }
             }
         }
