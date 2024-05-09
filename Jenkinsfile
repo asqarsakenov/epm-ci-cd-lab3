@@ -45,8 +45,12 @@ pipeline {
                     // Define application name based on branch for tagging
                     def appName = env.BRANCH_NAME == 'main' ? 'nodemain:v1.0' : 'nodedev:v1.0'
                     
-                    // Stop and remove any existing container
-                    sh "docker rm -f ${containerName} || true"
+                    // Check if the container exists and stop and remove it if it does
+                    sh """
+                      if docker ps -a | grep -q ${containerName}; then
+                        docker rm -f ${containerName}
+                      fi
+                    """
                     // Run the new container
                     docker.run(
                         "--name ${containerName} -d -p ${appPort}:${appPort} ${appName}",
