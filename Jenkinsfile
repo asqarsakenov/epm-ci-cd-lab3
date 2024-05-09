@@ -44,17 +44,14 @@ pipeline {
                     def containerName = env.BRANCH_NAME
                     // Define application name based on branch for tagging
                     def appName = env.BRANCH_NAME == 'main' ? 'nodemain:v1.0' : 'nodedev:v1.0'
-
-                    // Check if the container exists using Docker Pipeline commands
-                    def existingContainer = docker.listImages(nameFilter: "${containerName}").size() != 0
-                    if (existingContainer) {
-                        // Remove the existing container
-                        docker.image("${containerName}").remove(force: true)
-                    }
-
-                    // Run the new container
-                    docker.image(appName).run(
-                        "--name ${containerName} -d -p ${appPort}:${appPort}"
+                    
+                    // Check if the container exists and stop and remove it if it does
+                    sh """
+                      if docker ps -a | grep -q ${containerName}; then
+                        docker rm -f ${containerName}
+                      fi
+                      docker run --name ${containerName} -d -p ${appPort}:${appPort} ${appName}
+                    """
                     )
                 }
             }
