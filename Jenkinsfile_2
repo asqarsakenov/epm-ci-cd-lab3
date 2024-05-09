@@ -1,0 +1,32 @@
+pipeline {
+    agent any
+
+    parameters {
+        choice(name: 'DEPLOY_ENV', choices: ['main', 'dev'], description: 'Target environment to deploy')
+        string(name: 'IMAGE_TAG', defaultValue: 'v1.0', description: 'Tag of the Docker image to deploy')
+    }
+
+    stages {
+        stage('Deploy') {
+            steps {
+                script {
+                    // Determine the application name and port based on the chosen environment
+                    def appName = "node${params.DEPLOY_ENV}:${params.IMAGE_TAG}"
+                    def appPort = params.DEPLOY_ENV == 'main' ? '3000:3000' : '3001:3000'
+
+                    echo "Deploying ${appName} to ${params.DEPLOY_ENV} environment on port ${appPort.split(':')[0]}"
+
+                    // Pull the specified Docker image
+                    sh "docker pull ${appName}"
+
+                    // Stop and remove any existing container with the same name
+                    sh "docker stop ${params.DEPLOY_ENV} || true"
+                    sh "docker rm ${params.DEPLOY_ENV} || true"
+
+                    // Run the new Docker container
+                    sh "docker run -d --name ${params.DEPLOY_ENV} -p ${appPort} ${appName}"
+                }
+            }
+        }
+    }
+}
