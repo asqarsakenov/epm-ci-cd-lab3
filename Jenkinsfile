@@ -50,7 +50,7 @@ pipeline {
                       if docker ps -a | grep -q ${containerName}; then
                         docker rm -f ${containerName}
                       fi
-                      docker run --name ${containerName} -d -p ${appPort}:${appPort} ${appName}
+                      docker run --name ${containerName} -d -p ${appPort}:3000 ${appName}
                     """
                 
                 }
