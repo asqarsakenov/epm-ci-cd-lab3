@@ -6,11 +6,19 @@ pipeline {
     }
   stages {
     stage('Checkout') {
-      steps {
-        checkout scm
-      }
+        steps {
+            script {
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: "*/${env.BRANCH_NAME}"]],
+                    userRemoteConfigs: [[
+                        url: 'git@github.com:asqarsakenov/epm-ci-cd-lab3.git'
+                        credentialsId: 'b878bc33-60e4-4ff3-b570-d4ccdbb50dcb'
+                    ]]
+                ])
+            }
+        }
     }
-
     stage('Build') {
       steps {
         sh 'npm install'
