@@ -17,8 +17,6 @@ pipeline {
                     echo "Deploying ${appName} to ${params.DEPLOY_ENV} environment on port ${appPort.split(':')[0]}"
 
                     // Pull the specified Docker image
-                    sh "docker pull ${appName}"
-
                     // Stop and remove any existing container with the same name
                     sh "docker stop ${params.DEPLOY_ENV} || true"
                     sh "docker rm ${params.DEPLOY_ENV} || true"
